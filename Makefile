@@ -1,4 +1,4 @@
-.PHONY: all configure build migrate assets up daemon
+.PHONY: all configure build migrate assets up daemon lms-assets cms-assets
 
 all: configure build migrate assets daemon
 
@@ -14,9 +14,13 @@ migrate:
 	docker-compose run --rm lms bash -c "./wait-for-mysql.sh && ./manage.py lms --settings=production migrate"
 	docker-compose run --rm cms bash -c "./wait-for-mysql.sh && ./manage.py cms --settings=production migrate"
 
-assets:
-	docker-compose run --rm lms paver update_assets lms --settings=production
-	docker-compose run --rm cms paver update_assets cms --settings=production
+assets: lms-assets cms-assets
+
+lms-assets:
+	docker-compose run --rm lms paver update_assets lms --settings=production --collect-log=/openedx/data/logs
+
+cms-assets:
+	docker-compose run --rm cms paver update_assets cms --settings=production --collect-log=/openedx/data/logs
 
 ##################### Running commands
 

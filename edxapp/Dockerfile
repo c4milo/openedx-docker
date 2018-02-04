@@ -19,12 +19,12 @@ RUN apt install -y nodejs-legacy
 # Static assets will reside in /openedx/data and edx-platform will be
 # checked-out in /openedx/
 RUN mkdir /openedx /openedx/data /openedx/edx-platform
-VOLUME /openedx/data
+
 WORKDIR /openedx/edx-platform
 
 ## Checkout edx-platform code
 RUN git clone https://github.com/edx/edx-platform.git . && \
-  git checkout open-release/ginkgo.master 
+  git checkout open-release/ginkgo.master
 
 # Install python requirements
 RUN pip install -r requirements/edx/pre.txt
@@ -58,6 +58,10 @@ ARG service_variant
 # Configure environment
 ENV DJANGO_SETTINGS_MODULE ${service_variant}.envs.production
 ENV SERVICE_VARIANT ${service_variant}
+
+# Volumes with data we want to persist across container restarts
+VOLUME /openedx/data
+VOLUME /openedx/edx-platform/themes
 
 # Run server
 EXPOSE 8000
